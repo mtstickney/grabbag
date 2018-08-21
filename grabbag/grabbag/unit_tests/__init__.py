@@ -4,19 +4,20 @@ from django.urls import Resolver404
 
 from grabbag.middleware import BogonFilter
 
-class TestBogonFilterMiddleware(SimpleTestCase):
-    def _make_request(self, path, method='GET'):
-        request = HttpRequest()
-        request.path = path
-        request.method = method
-        return request
+def make_request(path, method='GET'):
+    request = HttpRequest()
+    request.path = path
+    request.method = method
+    request.session = {}
+    return request
 
+class TestBogonFilterMiddleware(SimpleTestCase):
     def test_404_returned(self):
         def app_view(request):
             return HttpResponseNotFound()
 
         app_middleware = BogonFilter(app_view)
-        response = app_middleware(self._make_request('/exists/'))
+        response = app_middleware(make_request('/exists/'))
 
         self.assertEquals(response.status_code, 404)
 
@@ -29,7 +30,7 @@ class TestBogonFilterMiddleware(SimpleTestCase):
             return HttpResponse("Yep, it works")
 
         app_middleware = BogonFilter(app_view)
-        response = app_middleware(self._make_request('/exists/'))
+        response = app_middleware(make_request('/exists/'))
 
         self.assertTrue(app_called)
         self.assertEquals(response.status_code, 200)
@@ -40,4 +41,4 @@ class TestBogonFilterMiddleware(SimpleTestCase):
 
         app_middleware = BogonFilter(app_view)
         with self.assertRaises(Resolver404):
-            response = app_middleware(self._make_request('/does_not_exist/'))
+            response = app_middleware(make_request('/does_not_exist/'))
