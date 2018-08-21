@@ -21,3 +21,8 @@ class User(models.Model):
     def password_matches(self, password):
         hash = base64.b64encode(hashlib.sha256(password.encode('utf-8')).digest())
         bcrypt.checkpw(hash, self.password_hash)
+
+class APIToken(models.Model):
+    token_id = models.CharField(max_length=100, primary_key=True)
+    expiration = models.DateTimeField()
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
