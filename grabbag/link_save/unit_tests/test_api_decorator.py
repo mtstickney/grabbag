@@ -44,7 +44,7 @@ class TestApiEndpointDecorator(SimpleTestCase):
     def test_401_with_bogus_token(self):
         app = ApiEndpoint(None, auth_factory=MockAuthorizer)
         request = make_request('/')
-        request.META['Authorization'] = 'Bearer: not-a-real-token'
+        request.META['Authorization'] = 'Bearer not-a-real-token'
         response = app(request)
 
         self.assertEqual(response.status_code, 401)
@@ -57,7 +57,7 @@ class TestApiEndpointDecorator(SimpleTestCase):
 
         app = ApiEndpoint(app_view, auth_factory=MockAuthorizer)
         request = make_request('/')
-        request.META['Authorization'] = 'Bearer: {}'.format(MASTER_API_TOKEN)
+        request.META['Authorization'] = 'Bearer {}'.format(MASTER_API_TOKEN)
         response = app(request)
 
         self.assertEqual(response.status_code, 200)
@@ -70,7 +70,7 @@ class TestApiEndpointDecorator(SimpleTestCase):
 
         app = ApiEndpoint(app_view, auth_factory=MockAuthorizer)
         request = make_request('/')
-        request.META['Authorization'] = 'Bearer: {}'.format('user-magic')
+        request.META['Authorization'] = 'Bearer {}'.format('user-magic')
         response = app(request)
 
         self.assertEqual(response.status_code, 200)
@@ -92,7 +92,7 @@ class TestApiEndpointDecorator(SimpleTestCase):
 
         app = ApiEndpoint(app_view, auth_factory=MockAuthorizer)
         request = make_request('/')
-        request.META['Authorization'] = 'bearer: {}'.format(MASTER_API_TOKEN)
+        request.META['Authorization'] = 'bearer {}'.format(MASTER_API_TOKEN)
         response = app(request)
 
         self.assertEqual(response.status_code, 200)
