@@ -1,3 +1,4 @@
+from django.utils import timezone
 from link_save.models import APIToken
 from link_save.settings import MASTER_API_TOKEN
 
@@ -19,7 +20,7 @@ class DBTokenRepo:
         return APIToken(token_id=MASTER_API_TOKEN, expiration=None, user=None)
 
     def clear_expired(self):
-        APIToken.objects.filter(expiration__lte=datetime.now()).delete()
+        APIToken.objects.filter(expiration__lte=timezone.now()).delete()
 
     def get_token(self, token):
         if token == MASTER_API_TOKEN:
@@ -30,7 +31,7 @@ class DBTokenRepo:
         except APIToken.DoesNotExist:
             raise InvalidTokenException(token, ["there is no such token"])
 
-        if api_token.expiration < datetime.now():
+        if api_token.expiration < timezone.now():
             raise InvalidTokenException(token, ["token is expired"])
 
         return api_token
@@ -38,7 +39,7 @@ class DBTokenRepo:
     def create_token(self, user):
         token = APIToken(
             token_id=str(uuid.uuid4()),
-            expiration=datetime.now() + self.expiration_time,
+            expiration=timezone.now() + self.expiration_length,
             user=user
         )
         token.save()
