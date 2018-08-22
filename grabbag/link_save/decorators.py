@@ -17,10 +17,10 @@ class ApiEndpoint:
         return response
 
     def __call__(self, request):
-        if 'Authorization' not in request.META:
+        if 'HTTP_AUTHORIZATION' not in request.META:
             return self._auth_err_response("You must supply an authorization token.")
 
-        match = re.match(r'^(?i)Bearer +([^ ]+)$', request.META['Authorization'])
+        match = re.match(r'^(?i)Bearer +([^ ]+)$', request.META['HTTP_AUTHORIZATION'])
         if not match:
             return self._auth_err_response("Malformed Authorization header.")
 
