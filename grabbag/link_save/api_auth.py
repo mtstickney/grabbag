@@ -41,7 +41,7 @@ class DBTokenRepo:
         token.save()
         return token
 
-class APIAuthenticator:
+class APIOracle:
     def __init__(self, token_repo):
         self.token_repo = token_repo
 
