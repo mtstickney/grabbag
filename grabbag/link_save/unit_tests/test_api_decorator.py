@@ -5,6 +5,8 @@ from link_save.settings import MASTER_API_TOKEN
 from link_save.api import GlobalApi, UserApi
 from link_save.api_auth import InvalidTokenException
 
+# We really don't need these to do anything, we just want to be able
+# to distinguish between the two sorts of api objects.
 class StubUserApi(UserApi):
     def __init__(self):
         pass
