@@ -1,7 +1,7 @@
 from django.test import SimpleTestCase
 
 from link_save.settings import MASTER_API_TOKEN
-from link_save.api_auth import APIOracle, InvalidTokenException
+from link_save.api_auth import APIAuthorizer, InvalidTokenException
 from link_save.api import GlobalApi, UserApi
 from link_save.models import APIToken, User
 from datetime import datetime, timedelta
@@ -41,17 +41,17 @@ class MemoryTokenRepo:
 
 class TestApiOracle(SimpleTestCase):
     def test_missing_token_denied(self):
-        authenticator = APIOracle(MemoryTokenRepo())
+        authenticator = APIAuthorizer(MemoryTokenRepo())
         with self.assertRaises(InvalidTokenException):
             authenticator.get_api('abcdef')
 
     def test_master_token_accepted(self):
-        authenticator = APIOracle(MemoryTokenRepo())
+        authenticator = APIAuthorizer(MemoryTokenRepo())
         api = authenticator.get_api(MASTER_API_TOKEN)
         self.assertIsInstance(api, GlobalApi)
 
     def test_expired_token_denied(self):
-        authenticator = APIOracle(MemoryTokenRepo(expiration_length=-1))
+        authenticator = APIAuthorizer(MemoryTokenRepo(expiration_length=-1))
 
         # Create a token that will be instantly expired.
         api = authenticator.get_api(MASTER_API_TOKEN)
@@ -61,7 +61,7 @@ class TestApiOracle(SimpleTestCase):
             authenticator.get_api(token_id)
 
     def test_user_token_accepted(self):
-        authenticator = APIOracle(MemoryTokenRepo())
+        authenticator = APIAuthorizer(MemoryTokenRepo())
         admin_api = authenticator.get_api(MASTER_API_TOKEN)
 
         user = User(id=1, username='jimmy')
