@@ -15,13 +15,20 @@
   endpoints to do useful things (you didn't think this was going to be
   user-friendly, did you?)
 
+  You may also need to alter your server settings to enable
+  passthrough of the Authorization header to support the API
+  authentication system (this is the =WSGIPassAuthorization= option
+  for mod_wsgi).
+
 * Features
   - API endpoints!
   - no UI to speak of!
   - hand-rolled auth system!
     - because who needs builtin framework modules, am I right?
       - ...no? Ok, so it's just me, then.
-  
+  - API authentication system that is nearly, but not quite, entirely
+    unlike OAuth 2.
+
 * Docs
 ** Running tests
    Tests can be run by issuing =make unittest= from the =grabbag=
