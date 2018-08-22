@@ -6,6 +6,10 @@ import re
 def make_authorizer():
     return APIAuthorizer
 
+class UnauthorizedException(Exception):
+    def __init__(self, message):
+        self.message = message
+
 class ApiEndpoint:
     def __init__(self, view, auth_factory=APIAuthorizer):
         self.authorizer = auth_factory()
@@ -30,4 +34,7 @@ class ApiEndpoint:
             return self._auth_err_response("Bad auth token {}: {}".format(e.token_id, e.message))
 
         request.api = api
-        return self.view(request)
+        try:
+            return self.view(request)
+        except UnauthorizedException as e:
+            return self._auth_err_response(e.message)

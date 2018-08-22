@@ -1,6 +1,6 @@
 from django.test import SimpleTestCase
 from django.http import HttpRequest, HttpResponse, Http404
-from link_save.decorators import ApiEndpoint
+from link_save.decorators import ApiEndpoint, UnauthorizedException
 from link_save.settings import MASTER_API_TOKEN
 from link_save.api import GlobalApi, UserApi
 from link_save.api_auth import InvalidTokenException
@@ -97,3 +97,17 @@ class TestApiEndpointDecorator(SimpleTestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b"Hi!")
+
+    def test_unauthorized_exception(self):
+        def app_view(request):
+            # UnauthorizedException is automatically converted to a
+            # 401 response.
+            raise UnauthorizedException("Nope, nuh-uh.")
+
+        app = ApiEndpoint(app_view, auth_factory=MockAuthorizer)
+        request = make_request('/')
+        request.META['HTTP_AUTHORIZATION'] = 'bearer {}'.format(MASTER_API_TOKEN)
+        response = app(request)
+
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response['WWW-Authenticate'], 'Bearer')
