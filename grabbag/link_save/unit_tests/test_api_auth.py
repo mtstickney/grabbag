@@ -39,19 +39,29 @@ class MemoryTokenRepo:
         self.tokens[token_id] = token
         return token
 
+    def make_user_api(self, user):
+        return UserApi(user)
+
+    def make_global_api(self):
+        return GlobalApi(self)
+
+def make_test_authorizer(expiration=86400):
+    token_repo = MemoryTokenRepo(expiration_length=expiration)
+    return APIAuthorizer(token_repo, token_repo.make_user_api, token_repo.make_global_api)
+
 class TestApiOracle(SimpleTestCase):
     def test_missing_token_denied(self):
-        authenticator = APIAuthorizer(MemoryTokenRepo())
+        authenticator = make_test_authorizer()
         with self.assertRaises(InvalidTokenException):
             authenticator.get_api('abcdef')
 
     def test_master_token_accepted(self):
-        authenticator = APIAuthorizer(MemoryTokenRepo())
+        authenticator = make_test_authorizer()
         api = authenticator.get_api(MASTER_API_TOKEN)
         self.assertIsInstance(api, GlobalApi)
 
     def test_expired_token_denied(self):
-        authenticator = APIAuthorizer(MemoryTokenRepo(expiration_length=-1))
+        authenticator = make_test_authorizer(-1)
 
         # Create a token that will be instantly expired.
         api = authenticator.get_api(MASTER_API_TOKEN)
@@ -61,7 +71,7 @@ class TestApiOracle(SimpleTestCase):
             authenticator.get_api(token_id)
 
     def test_user_token_accepted(self):
-        authenticator = APIAuthorizer(MemoryTokenRepo())
+        authenticator = make_test_authorizer()
         admin_api = authenticator.get_api(MASTER_API_TOKEN)
 
         user = User(id=1, username='jimmy')

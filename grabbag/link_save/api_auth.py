@@ -1,6 +1,5 @@
 from link_save.models import APIToken
 from link_save.settings import MASTER_API_TOKEN
-from link_save.api import GlobalApi, UserApi
 
 from datetime import datetime, timedelta
 import uuid
@@ -42,12 +41,14 @@ class DBTokenRepo:
         return token
 
 class APIAuthorizer:
-    def __init__(self, token_repo):
+    def __init__(self, token_repo, user_api_factory, global_api_factory):
         self.token_repo = token_repo
+        self.user_api_factory = user_api_factory
+        self.global_api_factory = global_api_factory
 
     def get_api(self, token_id):
         token = self.token_repo.get_token(token_id)
         if token.user is not None:
-            return UserApi(token.user)
+            return self.user_api_factory(token.user)
         else:
-            return GlobalApi(self.token_repo)
+            return self.global_api_factory()
