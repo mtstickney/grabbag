@@ -7,7 +7,7 @@ import base64
 PW_HASH_ROUNDS=12
 
 class User(models.Model):
-    username = models.CharField(max_length=75)
+    username = models.CharField(max_length=75, unique=True)
     email = models.EmailField()
     password_hash = models.BinaryField()
     add_date = models.DateField(auto_now_add=True)
