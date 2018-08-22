@@ -8,7 +8,7 @@ import uuid
 class InvalidTokenException(Exception):
     def __init__(self, token, reasons):
         self.message = "The token {} is invalid: {}.".format(token, ';'.join(reasons))
-        self.token = token
+        self.token_id = token
 
 class DBTokenRepo:
     # By default, tokens are valid for 24 hours.
