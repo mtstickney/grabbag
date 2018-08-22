@@ -22,3 +22,10 @@
     - because who needs builtin framework modules, am I right?
       - ...no? Ok, so it's just me, then.
   
+* Docs
+** Running tests
+   Tests can be run by issuing =make unittest= from the =grabbag=
+   directory.
+
+** API endpoints
+   None right now! The API is guaranteed to be bug-free.
