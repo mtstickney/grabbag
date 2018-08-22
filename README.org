@@ -11,7 +11,7 @@
 * Ok, fine, but how?
   Make sure you've got =LINKSAVE_MASTER_API_TOKEN= set in the settings
   file (can be any string up to 100 characters), then do whatever it
-  is you do to run Django apps. Once it's running, use the api
+  is you do to run Django apps. Once it's running, use the API
   endpoints to do useful things (you didn't think this was going to be
   user-friendly, did you?)
 
