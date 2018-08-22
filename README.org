@@ -1,0 +1,24 @@
+* What the?
+  This is a Django app for saving links to read later, similar to
+  Pocket or Instapaper. Currently barebones, but check back later (it
+  /still/ won't have the features you want).
+
+* But... /why/?
+  Because Instapaper and Pocket weren't invented here, obviously. Also
+  because [[https://wallabag.org/en][Wallabag]] was too much trouble to set up. This will be too
+  much trouble to set up as well, but at least it's /my/ trouble.
+
+* Ok, fine, but how?
+  Make sure you've got =LINKSAVE_MASTER_API_TOKEN= set in the settings
+  file (can be any string up to 100 characters), then do whatever it
+  is you do to run Django apps. Once it's running, use the api
+  endpoints to do useful things (you didn't think this was going to be
+  user-friendly, did you?)
+
+* Features
+  - API endpoints!
+  - no UI to speak of!
+  - hand-rolled auth system!
+    - because who needs builtin framework modules, am I right?
+      - ...no? Ok, so it's just me, then.
+  
