@@ -35,4 +35,67 @@
    directory.
 
 ** API endpoints
-   None right now! The API is guaranteed to be bug-free.
+   The API endpoints are located at urls under =/api/v1/= (where =v1=
+   might be something else if another version of the API is ever
+   done). Clients must present a valid API token with the
+   =Authorization: Bearer <token>= header. If the header is not
+   present, or the token is invalid, the endpoint will return a =401=
+   response. If the token is not authorized to perform the action in
+   question, a =401= response will also be returned. All endpoints
+   return data in JSON form.
+
+*** List API Tokens
+    - Endpoint: =tokens/=
+    - Method: =GET=, =HEAD=
+    - Scope: admin
+    - Return data: list of tokens (strings)
+
+    This method returns a list of all API tokens in the system.
+
+*** Create Admin Token
+    - Endpoint: =tokens/new/=
+    - Method: =POST=
+    - Submit data: none
+    - Scope: admin
+    - Return data: the newly created token (string)
+
+    Creates a new API token with administrative privileges, and
+    returns its ID. The resulting token is suitable for use in the
+    =Authorization= header after this call is complete.
+
+*** List Users
+    - Endpoint: =users/=
+    - Method: =GET=, =HEAD=
+    - Scope: admin
+    - Return data: a list of user objects, with the keys "id",
+      "username", "email", and "password".
+
+    This endpoint lists all the users in the system. In the result
+    data, the value for the "password" key is always =null=
+
+*** List Single User
+    - Endpoint: =users/<id>/=
+    - Method: =GET=, =HEAD=
+    - Scope: admin
+    - Return data: a user object, with keys "id", "username", "email",
+      and "password".
+
+    This endpoint is like the list users endpoint, except it only
+    returns data for a single user named by the =<id>=
+    parameter. Returns a =404= if there is no user with that id.
+
+*** Create User
+    - Endpoint: =users/new/=
+    - Method: =POST=
+    - Scope: admin
+    - Submit data: a user object, with keys "username", "email", and
+      "password". All other keys are ignored.
+    - Return data: new user's id
+
+    This method creates a new user in the system with the specified
+    username, email, and password. If a user with the same username
+    already exists, a =409= response is returned. If any of the
+    required keys are missing, or if they are not of the expected
+    type, a =400= response is returned.
+      
+

@@ -1,9 +1,12 @@
+# TODO: these all need tests.
+
 class InvalidUserException(Exception):
     pass
 
 class GlobalApi:
-    def __init__(self, token_repo):
+    def __init__(self, token_repo, user_repo):
         self.token_repo = token_repo
+        self.user_repo = user_repo
 
     def create_user_token(self, user):
         if user is None:
@@ -14,6 +17,10 @@ class GlobalApi:
     def create_admin_token(self):
         token = self.token_repo.create_token(None)
         return token.token_id
+
+    def create_user(self, username, email, password):
+        user = self.user_repo.create_user(username, email, password)
+        return user.id
 
 class UserApi:
     def __init__(self, user):

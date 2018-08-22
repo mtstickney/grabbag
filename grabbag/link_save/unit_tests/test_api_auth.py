@@ -8,6 +8,10 @@ from datetime import datetime, timedelta
 
 import uuid
 
+# CLEANUP: constructing actual API objects is going to get pretty
+# hairy as they get more complex, which makes this test suite
+# fragile.
+
 class MemoryTokenRepo:
     def __init__(self, expiration_length=500):
         self.expiration_length = timedelta(seconds=expiration_length)
@@ -43,7 +47,7 @@ class MemoryTokenRepo:
         return UserApi(user)
 
     def make_global_api(self):
-        return GlobalApi(self)
+        return GlobalApi(self, None)
 
 def make_test_authorizer(expiration=86400):
     token_repo = MemoryTokenRepo(expiration_length=expiration)
