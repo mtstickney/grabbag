@@ -3,6 +3,7 @@ from link_save.settings import MASTER_API_TOKEN
 
 from datetime import datetime, timedelta
 import uuid
+import itertools
 
 class InvalidTokenException(Exception):
     def __init__(self, token, reasons):
@@ -14,12 +15,15 @@ class DBTokenRepo:
     def __init__(self, expiration_length=86400):
         self.expiration_length = timedelta(seconds=expiration_length)
 
+    def _master_token(self):
+        return APIToken(token_id=MASTER_API_TOKEN, expiration=None, user=None)
+
     def clear_expired(self):
         APIToken.objects.filter(expiration__lte=datetime.now()).delete()
 
     def get_token(self, token):
         if token == MASTER_API_TOKEN:
-            return APIToken(token_id=MASTER_API_TOKEN, expiration=None, user=None)
+            return self._master_token()
 
         try:
             api_token = APIToken.objects.get(token_id=token)
@@ -39,6 +43,9 @@ class DBTokenRepo:
         )
         token.save()
         return token
+
+    def get_all_tokens(self):
+        return itertools.chain([self._master_token()], APIToken.objects.all())
 
 class APIAuthorizer:
     def __init__(self, token_repo, user_api_factory, global_api_factory):
