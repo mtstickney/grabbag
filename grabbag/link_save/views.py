@@ -68,6 +68,9 @@ class LinkSaveV1ApiApp:
             raise UnauthorizedException("You are not authorized to list users.")
 
         if id is not None:
+            if request.method == 'DELETE':
+                return self.delete_user(request, id=id)
+
             try:
                 user = self.user_repo.get_user_by_id(id)
                 return JsonResponse({"id": user.id, "username": user.username, "email": user.email, "password": None})
@@ -109,5 +112,17 @@ class LinkSaveV1ApiApp:
 
         return JsonResponse(user)
 
-    def delete_user(self, id):
-        pass
+    @endpoint
+    def delete_user(self, request, id):
+        if not isinstance(request.api, GlobalApi):
+            raise UnauthorizedException("You are not authorized to delete users.")
+
+        if request.content_type != 'application/json':
+            return HttpResponse("Invalid content-type.", status=400)
+
+        try:
+            request.api.delete_user(id)
+        except User.DoesNotExist:
+            return HttpResponse("There is no such user.", status=404)
+
+        return HttpResponse('')

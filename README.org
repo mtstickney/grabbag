@@ -97,5 +97,28 @@
     already exists, a =409= response is returned. If any of the
     required keys are missing, or if they are not of the expected
     type, a =400= response is returned.
+
+*** Delete User (POST)
+    - Endpoint: =users/<id>/delete/=
+    - Method: =POST=
+    - Scope: user or admin
+    - Submit data: none
+    - Return data: none
+
+    This method deletes the user named by the =id= parameter. If there
+    is no such user, a 404 is returned, otherwise a 200. This endpoint
+    may be used with admin tokens, or with a user token that was
+    issued for the user named by =id=. A user token may not be used to
+    delete any user other than the token's.
+
+*** Delete User (DELETE)
+    - Endpoint: =users/<id>/=
+    - Method: =DELETE=
+    - Scope: user or admin
+    - Submit data: none
+    - Return data: none
+
+    Same as the =POST= method for deleting users, only a different
+    interface for the operation. Delightfully RESTful.
       
 

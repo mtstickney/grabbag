@@ -22,6 +22,9 @@ class GlobalApi:
         user = self.user_repo.create_user(username, email, password)
         return user.id
 
+    def delete_user(self, id):
+        self.user_repo.delete_by_id(id)
+
 class UserApi:
     def __init__(self, user):
         if user is None:
