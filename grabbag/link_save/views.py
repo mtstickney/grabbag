@@ -110,7 +110,7 @@ class LinkSaveV1ApiApp:
         except UserExistsException as e:
             return HttpResponse("A user with username {} already exists.".format(data['username']), status=409)
 
-        return JsonResponse(user)
+        return JsonResponse(user, safe=False)
 
     @endpoint
     def delete_user(self, request, id):
