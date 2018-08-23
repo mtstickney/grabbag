@@ -95,7 +95,7 @@ class LinkSaveV1ApiApp:
             raise UnauthorizedException("You are not authorized to create users.")
 
         if request.content_type  != 'application/json':
-            return HttpResponse("Invalid content-type.", status=500)
+            return HttpResponse("Invalid content-type.", status=400)
 
         data = json.loads(request.body.decode(request.encoding if request.encoding is not None else settings.DEFAULT_CHARSET))
         if 'username' not in data or not isinstance(data['username'], str):
