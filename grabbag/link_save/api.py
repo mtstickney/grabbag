@@ -20,6 +20,9 @@ class GlobalApi:
         token = self.token_repo.create_token(None)
         return token.token_id
 
+    def get_all_tokens(self):
+        return self.token_repo.get_all_tokens()
+
     def create_user(self, username, email, password):
         user = self.user_repo.create_user(username, email, password)
         return user.id
@@ -29,6 +32,9 @@ class GlobalApi:
 
     def get_user(self, id):
         return self.user_repo.get_user_by_id(id)
+
+    def get_all_users(self):
+        return  self.user_repo.get_all_users()
 
     def update_user(self, id, data):
         user = self.get_user(id)

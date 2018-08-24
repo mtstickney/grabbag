@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_http_methods, require_safe
 from django.conf import settings
-from .decorators import ApiEndpoint
+from .decorators import ApiEndpoint, UnauthorizedException
 from .api_auth import DBTokenRepo, APIAuthorizer
 from .api import UserApi, GlobalApi
 from .users import DBUserRepo, UserExistsException
@@ -58,7 +58,10 @@ class LinkSaveV1ApiApp:
 
     @endpoint
     def get_tokens(self, request):
-        tokens = [t.token_id for t in self.token_repo.get_all_tokens()]
+        if not isinstance(request.api, GlobalApi):
+            raise UnauthorizedException("You are not authorized to list tokens.")
+
+        tokens = [t.token for t in request.api.get_all_tokens()]
         return JsonResponse(tokens, safe=False)
 
     @endpoint
@@ -71,7 +74,7 @@ class LinkSaveV1ApiApp:
 
     @endpoint
     def get_users(self, request, id=None):
-        if not isinstance(request.api, GlobalApi):
+        if id is None and not isinstance(request.api, GlobalApi):
             raise UnauthorizedException("You are not authorized to list users.")
 
         if id is not None:
@@ -81,7 +84,7 @@ class LinkSaveV1ApiApp:
                 return self.update_user(request, id=id)
 
             try:
-                user = self.user_repo.get_user_by_id(id)
+                user = request.api.get_user(id)
                 return JsonResponse({"id": user.id, "username": user.username, "email": user.email, "password": None})
             except User.DoesNotExist:
                 return HttpResponse("No such user.", content_type='text/plain;charset=utf-8', status=404)
@@ -91,7 +94,7 @@ class LinkSaveV1ApiApp:
                 "username": u.username,
                 "email": u.email,
                 "password": None
-            } for u in self.user_repo.get_all_users()]
+            } for u in request.api.get_all_users()]
 
             return JsonResponse(users, safe=False)
 
