@@ -121,4 +121,23 @@
     Same as the =POST= method for deleting users, only a different
     interface for the operation. Delightfully RESTful.
       
+*** Update User (PATCH)
+    - Endpoint: =users/<id>/=
+    - Method: =PATCH=
+    - Scope: user or admin
+    - Submit data: a subset of fields from a user create call
+    - Return data: updated user object (see user listing)
 
+    A PATCH call to the endpoint updates the user values specified in
+    the request, leaving other values unchanged. The updated user
+    object is returned in the response. A user token may only be used
+    to update the user the token is for.
+
+*** Update User (POST)
+    - Endpoint: =users/<id>/update/=
+    - Method: =POST=
+    - Scope: user or admin
+    - Submit data: a subset of fields from a user create call
+    - Return data: updated user object (see user listing)
+
+    Same as the =PATCH= user update endpoint, only via POST.

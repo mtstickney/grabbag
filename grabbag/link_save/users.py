@@ -24,3 +24,10 @@ class DBUserRepo:
 
     def delete_by_id(self, user_id):
         User.objects.get(id=user_id).delete()
+
+    def update_user(self, user):
+        try:
+            user.save(force_update=True)
+            return user
+        except ValueError:
+            raise User.DoesNotExist()

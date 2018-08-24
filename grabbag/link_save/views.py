@@ -10,6 +10,13 @@ from .models import User
 
 import json
 
+def request_json(request):
+    if request.encoding is None:
+        encoding = settings.DEFAULT_CHARSET
+    else:
+        encoding = request.encoding
+    return json.loads(request.body.decode(encoding))
+
 def make_default_auth():
     token_repo = DBTokenRepo()
     return APIAuthorizer(token_repo, )
@@ -70,6 +77,8 @@ class LinkSaveV1ApiApp:
         if id is not None:
             if request.method == 'DELETE':
                 return self.delete_user(request, id=id)
+            elif request.method == 'PATCH':
+                return self.update_user(request, id=id)
 
             try:
                 user = self.user_repo.get_user_by_id(id)
@@ -97,7 +106,7 @@ class LinkSaveV1ApiApp:
         if request.content_type  != 'application/json':
             return HttpResponse("Invalid content-type.", status=400)
 
-        data = json.loads(request.body.decode(request.encoding if request.encoding is not None else settings.DEFAULT_CHARSET))
+        data = request_json(request)
         if 'username' not in data or not isinstance(data['username'], str):
             return HttpResponse("Invalid username.", status=400)
         if 'email' not in data or (data['email'] is not None and not isinstance(data['email'], str)):
@@ -111,6 +120,28 @@ class LinkSaveV1ApiApp:
             return HttpResponse("A user with username {} already exists.".format(data['username']), status=409)
 
         return JsonResponse(user, safe=False)
+
+    @endpoint
+    def update_user(self, request, id):
+        if request.content_type != 'application/json':
+            return HttpResponse("Invalid content-type.", status=400)
+
+        data = request_json(request)
+        if 'username' in data and not isinstance(data['username'], str):
+            return HttpResponse("Invalid username.", status=400)
+        if 'email' in data and (data['email'] is not None and not isinstance(data['email'], str)):
+            return HttpResponse("Invalid email.", status=400)
+        if 'password' in data and not isinstance(data['password'], str):
+            return HttpResponse("Invalid password.", status=400)
+
+        try:
+            request.api.update_user(id, data)
+        except User.DoesNotExist:
+            return HttpResponse("There is no such user.", status=404)
+
+        user = request.api.get_user(id)
+        return JsonResponse({"username": user.username, "email": user.email, "password": None})
+
 
     @endpoint
     def delete_user(self, request, id):
