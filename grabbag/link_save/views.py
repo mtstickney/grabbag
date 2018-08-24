@@ -64,7 +64,7 @@ class LinkSaveV1ApiApp:
     @endpoint
     def create_admin_token(self, request):
         token = request.api.create_admin_token()
-        return JsonResponse(token)
+        return JsonResponse(token, safe=False)
 
     @endpoint
     def get_users(self, request, id=None):
