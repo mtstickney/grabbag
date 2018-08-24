@@ -1,3 +1,5 @@
+from functools import wraps
+
 from .decorators import UnauthorizedException
 
 # TODO: these all need tests.
@@ -5,7 +7,41 @@ from .decorators import UnauthorizedException
 class InvalidUserException(Exception):
     pass
 
-class GlobalApi:
+
+def apistub(msg=None):
+    def wrapper(method):
+        @wraps(method)
+        def wrapped(self, *args, **kwargs):
+            raise UnauthorizedException(msg if msg is not None else "You are not authorized to perform this operation")
+        return wrapped
+    return wrapper
+
+class ApiOperations:
+    @apistub(msg="You are not authorized to create administrator tokens.")
+    def create_admin_token(self): pass
+
+    @apistub(msg="You are not authorized to create user tokens.")
+    def create_user_token(self): pass
+
+    @apistub(msg="You are not authorized to list tokens.")
+    def get_all_tokens(self): pass
+
+    @apistub(msg="You are not authorized to create users.")
+    def create_user(self): pass
+
+    @apistub(msg="You are not authorized to delete users.")
+    def delete_user(self): pass
+
+    @apistub(msg="You are not authorized to list users.")
+    def get_user(self): pass
+
+    @apistub(msg="You are not authorized to list users.")
+    def get_all_users(self): pass
+
+    @apistub(msg="You are not authorized to alter user data.")
+    def update_user(self): pass
+
+class GlobalApi(ApiOperations):
     def __init__(self, token_repo, user_repo):
         self.token_repo = token_repo
         self.user_repo = user_repo
@@ -47,7 +83,7 @@ class GlobalApi:
         return self.user_repo.update_user(user)
 
 
-class UserApi:
+class UserApi(ApiOperations):
     def __init__(self, user):
         if user is None:
             raise InvalidUserException("User for user API must be non-null")

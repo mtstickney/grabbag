@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_http_methods, require_safe
 from django.conf import settings
-from .decorators import ApiEndpoint, UnauthorizedException
+from .decorators import ApiEndpoint
 from .api_auth import DBTokenRepo, APIAuthorizer
 from .api import UserApi, GlobalApi
 from .users import DBUserRepo, UserExistsException
@@ -58,24 +58,16 @@ class LinkSaveV1ApiApp:
 
     @endpoint
     def get_tokens(self, request):
-        if not isinstance(request.api, GlobalApi):
-            raise UnauthorizedException("You are not authorized to list tokens.")
-
         tokens = [t.token for t in request.api.get_all_tokens()]
         return JsonResponse(tokens, safe=False)
 
     @endpoint
     def create_admin_token(self, request):
-        if not isinstance(request.api, GlobalApi):
-            raise UnauthorizedException("You are not authorized to administrator tokens.")
-
         token = request.api.create_admin_token()
         return JsonResponse(token)
 
     @endpoint
     def get_users(self, request, id=None):
-        if id is None and not isinstance(request.api, GlobalApi):
-            raise UnauthorizedException("You are not authorized to list users.")
 
         if id is not None:
             if request.method == 'DELETE':
@@ -103,9 +95,6 @@ class LinkSaveV1ApiApp:
     # it's actually not appropriate.
     @endpoint
     def create_user(self, request):
-        if not isinstance(request.api, GlobalApi):
-            raise UnauthorizedException("You are not authorized to create users.")
-
         if request.content_type  != 'application/json':
             return HttpResponse("Invalid content-type.", status=400)
 
@@ -148,9 +137,6 @@ class LinkSaveV1ApiApp:
 
     @endpoint
     def delete_user(self, request, id):
-        if not isinstance(request.api, GlobalApi):
-            raise UnauthorizedException("You are not authorized to delete users.")
-
         if request.content_type != 'application/json':
             return HttpResponse("Invalid content-type.", status=400)
 

@@ -3,6 +3,7 @@ from django.test import SimpleTestCase
 from link_save.settings import MASTER_API_TOKEN
 from link_save.api_auth import APIAuthorizer, InvalidTokenException
 from link_save.api import GlobalApi, UserApi
+from link_save.decorators import UnauthorizedException
 from link_save.models import APIToken, User
 from datetime import datetime, timedelta
 
@@ -49,6 +50,14 @@ class MemoryTokenRepo:
     def make_global_api(self):
         return GlobalApi(self, None)
 
+class StubUserApi(UserApi):
+    def __init__(self):
+        pass
+
+class StubGlobalApi(GlobalApi):
+    def __init__(self):
+        pass
+
 def make_test_authorizer(expiration=86400):
     token_repo = MemoryTokenRepo(expiration_length=expiration)
     return APIAuthorizer(token_repo, token_repo.make_user_api, token_repo.make_global_api)
@@ -84,3 +93,20 @@ class TestApiOracle(SimpleTestCase):
         api = authenticator.get_api(token_id)
         self.assertIsInstance(api, UserApi)
         self.assertEqual(api.get_user().id, 1)
+
+    def test_undefined_op_attributeerror(self):
+        admin_api = StubGlobalApi()
+        user_api = StubUserApi()
+
+        # Normal invalid method calls result in an AttributeError.
+        with self.assertRaises(AttributeError):
+            admin_api.not_a_method()
+
+        with self.assertRaises(AttributeError):
+            user_api.not_a_method()
+
+    def test_unimplemented_op_unauthorized_error(self):
+        user_api = StubUserApi()
+        # unimplemented methods defined as API operatrions raise an UnauthorizedException
+        with self.assertRaises(UnauthorizedException):
+            user_api.create_admin_token()
