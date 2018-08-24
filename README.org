@@ -63,6 +63,18 @@
     returns its ID. The resulting token is suitable for use in the
     =Authorization= header after this call is complete.
 
+*** Create User Token
+    - Endpoint: =users/<id>/tokens/new/=
+    - Method: =POST=
+    - Submit data: none
+    - Scope: user, admin
+    - Return data: the newly created token (string)
+
+    Creates a new token scoped to the user named by =<id>=. A user
+    token may only be used to create user tokens for the original
+    tokens user (i.e. a user can create more tokens for themselves,
+    but not other users).
+
 *** List Users
     - Endpoint: =users/=
     - Method: =GET=, =HEAD=

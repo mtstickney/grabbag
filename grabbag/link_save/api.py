@@ -46,14 +46,13 @@ class GlobalApi(ApiOperations):
         self.token_repo = token_repo
         self.user_repo = user_repo
 
-    def create_user_token(self, user):
-        if user is None:
-            raise InvalidUserException("User for user token must be non-null.")
-        token = self.token_repo.create_token(user)
-        return token.token_id
-
     def create_admin_token(self):
         token = self.token_repo.create_token(None)
+        return token.token_id
+
+    def create_user_token(self, id):
+        user = self.get_user(id)
+        token = self.token_repo.create_token(user)
         return token.token_id
 
     def get_all_tokens(self):
@@ -84,17 +83,23 @@ class GlobalApi(ApiOperations):
 
 
 class UserApi(ApiOperations):
-    def __init__(self, user):
+    def __init__(self, user, token_repository):
         if user is None:
             raise InvalidUserException("User for user API must be non-null")
         self.__user = user
+        self.token_repository = token_repository
 
     def get_user(self, id):
         if id != self.__user.id:
             raise UnauthorizedException("You are not authorized to retrieve other users' data.")
+
         # TODO: This really ought to be defensively copied, but
         # Django's ORM doesn't have native support for that. Rats.
         return self.__user
+
+    def create_user_token(self, id):
+        user = self.get_user(id)
+        return self.token_repository.create_token(user)
 
     def update_user(self, id, data):
         user = self.get_user(id)

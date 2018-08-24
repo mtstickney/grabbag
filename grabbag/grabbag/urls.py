@@ -28,6 +28,7 @@ urlpatterns = [
         path('users/<int:id>/', require_http_methods(["GET", "HEAD", "DELETE", "PATCH"])(v1_api_app.get_users)),
         path('users/new/', require_POST(v1_api_app.create_user)),
         path('users/<int:id>/delete/', require_POST(v1_api_app.delete_user)),
-        path('users/<int:id>/update/', require_POST(v1_api_app.update_user))
+        path('users/<int:id>/update/', require_POST(v1_api_app.update_user)),
+        path('users/<int:id>/tokens/new/', require_POST(v1_api_app.create_user_token))
     ]))
 ]

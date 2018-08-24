@@ -48,7 +48,7 @@ class LinkSaveV1ApiApp:
         self.api_auth = APIAuthorizer(self.token_repo, self.make_user_api, self.make_global_api)
 
     def make_user_api(self, user):
-        return UserApi(user)
+        return UserApi(user, self.token_repo)
 
     def make_global_api(self):
         return GlobalApi(self.token_repo, self.user_repo)
@@ -67,8 +67,15 @@ class LinkSaveV1ApiApp:
         return JsonResponse(token, safe=False)
 
     @endpoint
-    def get_users(self, request, id=None):
+    def create_user_token(self, request, id):
+        try:
+            token = request.api.create_user_token(id)
+        except User.DoesNotExist:
+            return HttpResponse("No such user.", status=404)
+        return JsonResponse(token, safe=False)
 
+    @endpoint
+    def get_users(self, request, id=None):
         if id is not None:
             if request.method == 'DELETE':
                 return self.delete_user(request, id=id)

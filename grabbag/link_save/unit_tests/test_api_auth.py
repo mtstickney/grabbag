@@ -17,6 +17,7 @@ class MemoryTokenRepo:
     def __init__(self, expiration_length=500):
         self.expiration_length = timedelta(seconds=expiration_length)
         self.tokens = {}
+        self.users = [User(id=1, username="jimmy")]
 
     def clear_expired(self):
         tokens = self.tokens.keys()
@@ -45,10 +46,17 @@ class MemoryTokenRepo:
         return token
 
     def make_user_api(self, user):
-        return UserApi(user)
+        return UserApi(user, self)
 
     def make_global_api(self):
-        return GlobalApi(self, None)
+        return GlobalApi(self, self)
+
+    # User repository methods.
+    def get_user_by_id(self, id):
+        for u in self.users:
+            if u.id == id:
+                return u
+        raise User.DoesNotExist
 
 class StubUserApi(UserApi):
     def __init__(self):
@@ -87,12 +95,14 @@ class TestApiOracle(SimpleTestCase):
         authenticator = make_test_authorizer()
         admin_api = authenticator.get_api(MASTER_API_TOKEN)
 
-        user = User(id=1, username='jimmy')
-        token_id = admin_api.create_user_token(user)
+        user_id = 1
+        token_id = admin_api.create_user_token(user_id)
 
         api = authenticator.get_api(token_id)
         self.assertIsInstance(api, UserApi)
-        self.assertEqual(api.get_user().id, 1)
+        with self.assertRaises(UnauthorizedException):
+            api.get_user(2)
+        self.assertEqual(api.get_user(user_id).id, 1)
 
     def test_undefined_op_attributeerror(self):
         admin_api = StubGlobalApi()
