@@ -28,6 +28,7 @@
       - ...no? Ok, so it's just me, then.
   - API authentication system that is nearly, but not quite, entirely
     unlike OAuth 2.
+  - capabilities-based API authorization system
 
 * Docs
 ** Running tests
